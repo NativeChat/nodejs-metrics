@@ -1,0 +1,34 @@
+{
+  "name": "nodejs-metrics",
+  "version": "0.1.0",
+  "description": "Module which provides metrics server for NodeJS applications.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node spec/unit-runner.js",
+    "test-integration": "node spec/integration-runner.js",
+    "lint": "node ./node_modules/eslint/bin/eslint ./lib/ ./spec/ index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Icenium/nodejs-metrics.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Icenium/nodejs-metrics/issues"
+  },
+  "homepage": "https://github.com/Icenium/nodejs-metrics#readme",
+  "dependencies": {
+    "@progresskinvey/prometheus-stats-library": "0.1.3",
+    "express-prom-bundle": "5.1.5",
+    "sinon": "8.1.0"
+  },
+  "devDependencies": {
+    "eslint": "6.8.0",
+    "express": "4.17.1",
+    "jasmine": "3.5.0",
+    "jasmine-expect": "4.0.3",
+    "jasmine-reporters": "2.3.2"
+  }
+}
