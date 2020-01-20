@@ -9,36 +9,36 @@ const { existsSync, mkdirSync } = require('fs');
 
 
 const addReporters = (jasmineEnv) => {
-  const reportsPath = `${__dirname}/../reports`;
-  if (!existsSync(reportsPath)) {
-    mkdirSync(reportsPath);
-  }
+    const reportsPath = `${__dirname}/../reports`;
+    if (!existsSync(reportsPath)) {
+        mkdirSync(reportsPath);
+    }
 
-  const junitReporter = new JUnitXmlReporter({
-    savePath: reportsPath,
-    consolidateAll: false
-  });
-
-  jasmineEnv.addReporter(junitReporter);
-
-  if (process.env.TERMINAL_REPORTER_ENABLED) {
-    const terminalReporter = new TerminalReporter({
-      color: true,
-      verbosity: 3
+    const junitReporter = new JUnitXmlReporter({
+        savePath: reportsPath,
+        consolidateAll: false
     });
 
-    jasmineEnv.addReporter(terminalReporter);
-  }
+    jasmineEnv.addReporter(junitReporter);
+
+    if (process.env.TERMINAL_REPORTER_ENABLED) {
+        const terminalReporter = new TerminalReporter({
+            color: true,
+            verbosity: 3
+        });
+
+        jasmineEnv.addReporter(terminalReporter);
+    }
 };
 
 module.exports = (jasmineConfigFile, configure) => {
-  const jasmineEnv = new Jasmine();
-  jasmineEnv.loadConfigFile(jasmineConfigFile);
-  addReporters(jasmineEnv);
+    const jasmineEnv = new Jasmine();
+    jasmineEnv.loadConfigFile(jasmineConfigFile);
+    addReporters(jasmineEnv);
 
-  if (configure && typeof configure === 'function') {
-    configure(jasmine);
-  }
+    if (configure && typeof configure === 'function') {
+        configure(jasmine);
+    }
 
-  jasmineEnv.execute();
+    jasmineEnv.execute();
 };

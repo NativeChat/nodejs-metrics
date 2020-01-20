@@ -4,6 +4,6 @@ const { Metrics } = require('./lib/metrics');
 const { ExpressMiddlewareDefaultSettings } = require('./lib/constants');
 
 module.exports = {
-  Metrics,
-  ExpressMiddlewareDefaultSettings
+    Metrics,
+    ExpressMiddlewareDefaultSettings
 };
