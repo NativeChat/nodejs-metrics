@@ -17,8 +17,8 @@ const httpGet = async (url) => {
     return metricsResult;
 };
 
-const verifyMetricsResponse = async (expectedMetrics) => {
-    const metricsResponse = await httpGet('http://localhost:39110/metrics');
+const verifyMetricsResponse = async (expectedMetrics, port) => {
+    const metricsResponse = await httpGet(`http://localhost:${port}/metrics`);
 
     expectedMetrics.forEach((expectedMetric) => {
         expect(metricsResponse).toContain(expectedMetric);
