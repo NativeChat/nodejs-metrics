@@ -53,7 +53,8 @@ describe('Metrics', () => {
     describe('getMonitoringMiddleware', () => {
         it('should pass the register of the metrics backend to the express middleware provider.', async () => {
             const expectedRegister = {};
-            const { expressMiddlewareProvider } = getMetrics(expectedRegister);
+            const { expressMiddlewareProvider, metrics } = getMetrics(expectedRegister);
+            metrics.getMonitoringMiddleware();
 
             expect(expressMiddlewareProvider.calledOnceWithExactly(expectedRegister)).toBeTrue();
         });
