@@ -23,23 +23,22 @@ describe('MetricsTracker', () => {
             const client = metrics.getClient();
             const tracker = new MetricsTracker({
                 metrics: {
-                    'test': new (client.Histogram)({
+                    test: new (client.Histogram)({
                         name: 'test',
                         help: 'some help',
-                        labelNames: ['foo']
+                        labelNames: ['foo', 'error']
                     })
                 }
             });
 
             const baseOptions = {
                 metricName: 'test',
-                labels: { 'foo': 'bar' },
-                action: async () => { }
+                labels: { 'foo': 'bar' }
             };
 
             await tracker.trackHistogramDuration(Object.assign(baseOptions, { action: async () => { } }));
 
-            expectAsync(tracker.trackHistogramDuration(Object.assign(baseOptions, {
+            await expectAsync(tracker.trackHistogramDuration(Object.assign(baseOptions, {
                 action: async () => {
                     const err = new Error();
                     err.name = 'TestErr';
@@ -64,16 +63,29 @@ describe('MetricsTracker', () => {
                 'test_bucket{le="10",foo="bar"} 1',
                 'test_bucket{le="+Inf",foo="bar"} 1',
                 'test_sum{foo="bar"}',
-                'test_count{foo="bar"} 1'
+                'test_count{foo="bar"} 1',
+                'test_bucket{le="0.005",foo="bar",error="TestErr"} 1',
+                'test_bucket{le="0.01",foo="bar",error="TestErr"} 1',
+                'test_bucket{le="0.025",foo="bar",error="TestErr"} 1',
+                'test_bucket{le="0.05",foo="bar",error="TestErr"} 1',
+                'test_bucket{le="0.1",foo="bar",error="TestErr"} 1',
+                'test_bucket{le="0.25",foo="bar",error="TestErr"} 1',
+                'test_bucket{le="0.5",foo="bar",error="TestErr"} 1',
+                'test_bucket{le="1",foo="bar",error="TestErr"} 1',
+                'test_bucket{le="2.5",foo="bar",error="TestErr"} 1',
+                'test_bucket{le="5",foo="bar",error="TestErr"} 1',
+                'test_bucket{le="10",foo="bar",error="TestErr"} 1',
+                'test_bucket{le="+Inf",foo="bar",error="TestErr"} 1',
+                'test_sum{foo="bar",error="TestErr"}',
+                'test_count{foo="bar",error="TestErr"} 1'
             ], DefaultMetricsServerPort);
         });
-
 
         it('should track counter metrics.', async () => {
             const client = metrics.getClient();
             const tracker = new MetricsTracker({
                 metrics: {
-                    'test': new (client.Counter)({
+                    test: new (client.Counter)({
                         name: 'test',
                         help: 'some help',
                         labelNames: ['foo']
