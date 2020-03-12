@@ -4,8 +4,6 @@ const { verifyMetricsResponse } = require('../helpers/helpers');
 
 const { Metrics, MetricsTracker } = require('../../index');
 
-const DefaultMetricsServerPort = 39110;
-
 describe('MetricsTracker', () => {
     let metrics;
 
@@ -78,7 +76,7 @@ describe('MetricsTracker', () => {
                 'test_bucket{le="+Inf",foo="bar",error="TestErr"} 1',
                 'test_sum{foo="bar",error="TestErr"}',
                 'test_count{foo="bar",error="TestErr"} 1'
-            ], DefaultMetricsServerPort);
+            ]);
         });
 
         it('should track counter metrics.', async () => {
@@ -102,7 +100,7 @@ describe('MetricsTracker', () => {
                 '# HELP test some help',
                 '# TYPE test counter',
                 'test{foo="bar"} 1'
-            ], DefaultMetricsServerPort);
+            ]);
         });
     });
 });
