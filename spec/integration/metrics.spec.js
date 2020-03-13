@@ -4,9 +4,9 @@ const express = require('express');
 
 const { httpGet, verifyMetricsResponse } = require('../helpers/helpers');
 
-const { Metrics } = require('../../index');
+const { DefaultMetricsServerPort } = require('../constants');
 
-const DefaultMetricsServerPort = 39110;
+const { Metrics } = require('../../index');
 
 const DefaultNodeJSMetrics = [
     '# TYPE process_cpu_user_seconds_total counter',
@@ -40,7 +40,7 @@ describe('Metrics', () => {
 
     describe('Server', () => {
         it('should return default nodejs and http metrics.', async () => {
-            await verifyMetricsResponse(DefaultNodeJSMetrics, DefaultMetricsServerPort);
+            await verifyMetricsResponse(DefaultNodeJSMetrics);
         });
 
         it('should return express req/res metrics.', async () => {
@@ -72,7 +72,7 @@ describe('Metrics', () => {
                 'http_request_duration_seconds_count{status_code="404",method="GET",path="/__notFound__"} 1'
             ];
 
-            await verifyMetricsResponse(expectedMetrics, DefaultMetricsServerPort);
+            await verifyMetricsResponse(expectedMetrics);
         });
 
         it('should start the server on a new port if the default one is busy.', async () => {

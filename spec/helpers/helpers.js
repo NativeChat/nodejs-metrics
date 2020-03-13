@@ -1,6 +1,7 @@
 'use strict';
 
 const http = require('http');
+const { DefaultMetricsServerPort } = require('../constants');
 
 const httpGet = async (url) => {
     const metricsResult = await new Promise((resolve, reject) => {
@@ -17,7 +18,7 @@ const httpGet = async (url) => {
     return metricsResult;
 };
 
-const verifyMetricsResponse = async (expectedMetrics, port) => {
+const verifyMetricsResponse = async (expectedMetrics, port = DefaultMetricsServerPort) => {
     const metricsResponse = await httpGet(`http://localhost:${port}/metrics`);
 
     expectedMetrics.forEach((expectedMetric) => {
