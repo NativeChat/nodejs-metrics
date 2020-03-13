@@ -2,9 +2,9 @@
 
 const { verifyMetricsResponse } = require('../helpers/helpers');
 
-const { DefaultExternalServiceMetricsTracker, Metrics } = require('../../index');
+const { ExternalServiceMetricsTracker, Metrics } = require('../../index');
 
-describe('DefaultExternalServiceMetricsTracker', () => {
+describe('ExternalServiceMetricsTracker', () => {
     let metrics;
 
     beforeEach(async () => {
@@ -16,19 +16,19 @@ describe('DefaultExternalServiceMetricsTracker', () => {
         await metrics.destroy();
     });
 
-    it('should return error if no promClient is passed.', () => {
-        expect(() => { new DefaultExternalServiceMetricsTracker({}); }).toThrowError('promClient argument is mandatory.');
+    it('should throw error if no promClient is passed.', () => {
+        expect(() => { new ExternalServiceMetricsTracker({}); }).toThrowError('promClient argument is mandatory.');
     });
 
     it('should throw if instantiated multiple times with the same promClient.', () => {
         const promClient = metrics.getClient();
-        new DefaultExternalServiceMetricsTracker({ promClient });
-        expect(() => { new DefaultExternalServiceMetricsTracker({ promClient }); }).toThrowError('A metric with the name external_service_request_duration_seconds has already been registered.');
+        new ExternalServiceMetricsTracker({ promClient });
+        expect(() => { new ExternalServiceMetricsTracker({ promClient }); }).toThrowError('A metric with the name external_service_request_duration_seconds has already been registered.');
     });
 
     it('returned tracker should track histogram metrics.', async () => {
         const promClient = metrics.getClient();
-        const tracker = new DefaultExternalServiceMetricsTracker({ promClient });
+        const tracker = new ExternalServiceMetricsTracker({ promClient });
 
         const baseOptions = {
             targetLabel: 'test_label'
