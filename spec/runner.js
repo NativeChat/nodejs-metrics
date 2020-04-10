@@ -21,14 +21,12 @@ const addReporters = (jasmineEnv) => {
 
     jasmineEnv.addReporter(junitReporter);
 
-    if (process.env.TERMINAL_REPORTER_ENABLED) {
-        const terminalReporter = new TerminalReporter({
-            color: true,
-            verbosity: 3
-        });
+    const terminalReporter = new TerminalReporter({
+        color: true,
+        verbosity: 3
+    });
 
-        jasmineEnv.addReporter(terminalReporter);
-    }
+    jasmineEnv.addReporter(terminalReporter);
 };
 
 module.exports = (jasmineConfigFile, configure) => {
