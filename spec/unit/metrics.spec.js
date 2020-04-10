@@ -7,7 +7,8 @@ const getBackend = (register = {}) => {
     const backend = {
         startServer: sinon.usingPromise().spy(),
         stopServer: sinon.usingPromise().spy(),
-        getClient: sinon.stub().returns({ register })
+        getClient: sinon.stub().returns({ register }),
+        getServerPort: () => {/* No implementation required */ }
     };
 
     return backend;
