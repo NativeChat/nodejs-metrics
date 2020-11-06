@@ -108,3 +108,8 @@ dist
 
 # Test reports
 reports
+
+*.js
+*.js.map
+*.d.ts
+!declarations/**/*.d.ts

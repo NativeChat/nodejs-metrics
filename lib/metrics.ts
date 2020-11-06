@@ -1,19 +1,25 @@
-'use strict';
+import promBundle from "express-prom-bundle";
+import { ILogger } from "nchat-dev-common";
 
-const promBundle = require('express-prom-bundle');
+import { PrometheusMetricsBackend } from "./backends/prometheus";
 
-const { PrometheusMetricsBackend } = require('./backends/prometheus');
+import { ExpressMiddlewareDefaultSettings, DefaultBackendSettings } from "./constants";
+import { IBackendSettings, IMetricsBackend } from "./types";
 
-const { ExpressMiddlewareDefaultSettings, DefaultBackendSettings } = require('./constants');
+export class Metrics {
+    private _logger: ILogger;
+    private _backend: IMetricsBackend;
+    private _expressMiddlewareProvider: any;
+    private _expressMiddlewareSettings: any;
+    private _prometheusMiddleware: any;
 
-class Metrics {
     constructor({
         logger,
         backend,
         backendSettings,
         expressMiddlewareProvider,
-        expressMiddlewareSettings
-    } = {}) {
+        expressMiddlewareSettings,
+    } = {} as any) {
         this._logger = logger || console;
 
         this._backend = backend || this._getDefaultBackend(backendSettings);
@@ -21,41 +27,42 @@ class Metrics {
         this._expressMiddlewareSettings = expressMiddlewareSettings;
     }
 
-    async init() {
+    public async init() {
         await this._backend.startServer();
         this._logger.info(`Monitoring server started on port ${this._backend.getServerPort()}.`);
     }
 
-    getMonitoringMiddleware() {
+    public getMonitoringMiddleware() {
         this._setupExpressMiddleware(this._expressMiddlewareProvider, this._expressMiddlewareSettings);
+
         return this._prometheusMiddleware;
     }
 
-    async destroy() {
+    public async destroy() {
         await this._backend.stopServer();
-        this._logger.info('Monitoring server stopped.');
+        this._logger.info("Monitoring server stopped.");
     }
 
-    getServerPort() {
+    public getServerPort() {
         const port = this._backend.getServerPort();
 
         return port;
     }
 
-    getClient() {
+    public getClient() {
         return this._backend.getClient();
     }
 
-    _setupExpressMiddleware(expressMiddlewareProvider, expressMiddlewareSettings) {
+    private _setupExpressMiddleware(expressMiddlewareProvider: any, expressMiddlewareSettings: any) {
         if (!this._prometheusMiddleware) {
             const metricsRegister = this._backend.getClient().register;
 
             if (!expressMiddlewareProvider) {
                 // Use the Kinvey registry for the metrics in the middleware.
-                promBundle.promClient.register = metricsRegister;
+                (promBundle as any).promClient.register = metricsRegister;
             }
 
-            const settings = Object.assign({}, ExpressMiddlewareDefaultSettings, expressMiddlewareSettings);
+            const settings = { ...ExpressMiddlewareDefaultSettings, ...expressMiddlewareSettings };
 
             const provider = expressMiddlewareProvider ? expressMiddlewareProvider(metricsRegister) : promBundle;
 
@@ -63,12 +70,14 @@ class Metrics {
         }
     }
 
-    _getDefaultBackend(backendSettings) {
-        const settings = Object.assign({ logger: this._logger }, backendSettings || DefaultBackendSettings);
+    private _getDefaultBackend(backendSettings: Partial<IBackendSettings>): IMetricsBackend {
+        const settings = {
+            logger: this._logger,
+            ...DefaultBackendSettings,
+            ...backendSettings,
+        };
         const backend = new PrometheusMetricsBackend(settings);
 
         return backend;
     }
 }
-
-module.exports = { Metrics };
