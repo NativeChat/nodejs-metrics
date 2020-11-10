@@ -1,4 +1,3 @@
-
 import { verifyMetricsResponse } from "../helpers/helpers";
 
 import { ExternalServiceMetricsTracker, Metrics } from "../../index";
