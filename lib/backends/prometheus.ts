@@ -9,12 +9,12 @@ import { DefaultBackendSettings } from "../constants";
 import { IBackendSettings, IMetricsBackend, IPromClient } from "../types";
 
 export class PrometheusMetricsBackend implements IMetricsBackend {
-    private _client: typeof client;
-    private _logger: ILogger;
-    private _metricsServer?: http.Server;
-    private _desiredServerPort: number;
-    private _serverPort: number;
-    private _defaultMetricsTimeout: number;
+    private client: typeof client;
+    private logger: ILogger;
+    private metricsServer?: http.Server;
+    private desiredServerPort: number;
+    private serverPort: number;
+    private defaultMetricsTimeout: number;
     private app?: express.Express;
 
     constructor(settings?: Partial<IBackendSettings>) {
@@ -24,10 +24,10 @@ export class PrometheusMetricsBackend implements IMetricsBackend {
             serverPort,
         } = { ...DefaultBackendSettings, ...settings };
 
-        this._setupServer();
+        this.setupServer();
 
-        this._client = client;
-        this._logger = logger || {
+        this.client = client;
+        this.logger = logger || {
             // tslint:disable-next-line: no-console
             debug: () => console.debug,
             // tslint:disable-next-line: no-console
@@ -36,43 +36,43 @@ export class PrometheusMetricsBackend implements IMetricsBackend {
             warn: () => console.warn,
             // tslint:disable-next-line: no-console
             error: () => console.error,
-            child: () => this._logger,
+            child: () => this.logger,
             filterFunction: (x) => x,
         };
 
-        this._desiredServerPort = serverPort || 0;
-        this._serverPort = -1;
-        this._defaultMetricsTimeout = defaultMetricsTimeout || DefaultBackendSettings.defaultMetricsTimeout || 0;
+        this.desiredServerPort = serverPort || 0;
+        this.serverPort = -1;
+        this.defaultMetricsTimeout = defaultMetricsTimeout || DefaultBackendSettings.defaultMetricsTimeout || 0;
     }
 
     public getClient(): IPromClient {
-        return this._client;
+        return this.client;
     }
 
     public getServerPort(): number {
-        return this._serverPort;
+        return this.serverPort;
     }
 
     public async startServer(): Promise<void> {
         let isResolved = false;
 
-        this._serverPort = await this._getServerPort(this._desiredServerPort);
+        this.serverPort = await this.createServer(this.desiredServerPort);
 
         await new Promise((resolve, reject) => {
             if (!this.app) {
                 throw new Error("'app' has not been initialized");
             }
 
-            this._metricsServer = this.app.listen(this._serverPort, () => {
+            this.metricsServer = this.app.listen(this.serverPort, () => {
                 isResolved = true;
 
-                this._client.collectDefaultMetrics({ timeout: this._defaultMetricsTimeout });
+                this.client.collectDefaultMetrics({ timeout: this.defaultMetricsTimeout });
 
-                resolve(this._metricsServer);
+                resolve(this.metricsServer);
             });
 
-            this._metricsServer.once("error", (err) => {
-                this._logger.error(err);
+            this.metricsServer.once("error", (err) => {
+                this.logger.error(err);
 
                 if (!isResolved) {
                     reject(err);
@@ -83,19 +83,19 @@ export class PrometheusMetricsBackend implements IMetricsBackend {
 
     public async stopServer(): Promise<void> {
         return new Promise((resolve, reject) => {
-            if (this._metricsServer && this._metricsServer.address() !== null) {
-                this._client.register.clear();
+            if (this.metricsServer && this.metricsServer.address() !== null) {
+                this.client.register.clear();
 
-                return this._metricsServer.close((err) => {
+                return this.metricsServer.close((err) => {
                     if (err) {
                         reject(err);
 
                         return;
                     }
 
-                    if (this._metricsServer) {
-                        this._metricsServer.unref();
-                        this._metricsServer.removeAllListeners();
+                    if (this.metricsServer) {
+                        this.metricsServer.unref();
+                        this.metricsServer.removeAllListeners();
                     }
 
                     resolve();
@@ -106,13 +106,13 @@ export class PrometheusMetricsBackend implements IMetricsBackend {
         });
     }
 
-    private _setupServer(): void {
+    private setupServer(): void {
         this.app = express();
 
         this.app.get("/metrics", (_req, res) => {
-            const metrics = this._client.register.metrics({ timestamps: false });
+            const metrics = this.client.register.metrics({ timestamps: false });
 
-            res.set("Content-Type", this._client.register.contentType);
+            res.set("Content-Type", this.client.register.contentType);
             res.end(metrics);
         });
 
@@ -121,19 +121,19 @@ export class PrometheusMetricsBackend implements IMetricsBackend {
         });
     }
 
-    private async _getServerPort(port: number): Promise<number> {
+    private async createServer(desiredPort: number): Promise<number> {
         return new Promise((resolve, reject) => {
             const server = createServer();
 
             server.once("error", (err: any) => {
                 if (err.code === "EADDRINUSE") {
-                    if (port === 0) {
+                    if (desiredPort === 0) {
                         reject(new Error("Cannot allocate random free port"));
 
                         return;
                     }
 
-                    this._getServerPort(0).then(resolve, reject);
+                    this.createServer(0).then(resolve, reject);
 
                     return;
                 }
@@ -155,7 +155,7 @@ export class PrometheusMetricsBackend implements IMetricsBackend {
                 });
             });
 
-            server.listen(port);
+            server.listen(desiredPort);
         });
     }
 }

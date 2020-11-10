@@ -3,7 +3,7 @@ import { MetricsTracker } from "./metrics-tracker";
 import { IExternalServiceMetricsTrackingOptions, IExternalServiceMetricsTracker, IMetricsClient } from "./types";
 
 export class ExternalServiceMetricsTracker implements IExternalServiceMetricsTracker {
-    private _metricsTracker: MetricsTracker;
+    private metricsTracker: MetricsTracker;
 
     constructor({ promClient }: { promClient: IMetricsClient }) {
         if (!promClient) {
@@ -20,7 +20,7 @@ export class ExternalServiceMetricsTracker implements IExternalServiceMetricsTra
             }),
         };
 
-        this._metricsTracker = new MetricsTracker({ metrics });
+        this.metricsTracker = new MetricsTracker({ metrics });
     }
 
     public async trackHistogramDuration<T>({
@@ -28,7 +28,7 @@ export class ExternalServiceMetricsTracker implements IExternalServiceMetricsTra
         action,
         handleResult,
     }: IExternalServiceMetricsTrackingOptions<T>) {
-        return await this._metricsTracker.trackHistogramDuration({
+        return await this.metricsTracker.trackHistogramDuration({
             metricName: ExternalServiceMetricConstants.Name,
             labels: {
                 [ExternalServiceMetricConstants.Labels.Target]: targetLabel,

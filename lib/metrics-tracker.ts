@@ -16,7 +16,7 @@ export class MetricsTracker implements IMetricsTracker {
             return action();
         }
 
-        this._verifyMetric(metricName);
+        this.verifyMetric(metricName);
 
         // tslint:disable-next-line: no-parameter-reassignment
         labels = labels || {};
@@ -46,13 +46,13 @@ export class MetricsTracker implements IMetricsTracker {
             return;
         }
 
-        this._verifyMetric(metricName);
+        this.verifyMetric(metricName);
 
         const metric = this.metrics[metricName] as ICounter;
         metric.inc(labels, count);
     }
 
-    private _verifyMetric(metricName: string) {
+    private verifyMetric(metricName: string) {
         if (!this.metrics || !this.metrics[metricName]) {
             throw new Error(`Metric with name ${metricName} is not registered in the metrics tracker`);
         }

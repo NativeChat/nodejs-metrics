@@ -8,11 +8,11 @@ import { ExpressMiddlewareDefaultSettings, DefaultBackendSettings } from "./cons
 import { ExpressMiddlewareProvider, IBackendSettings, IExpressMiddlewareSettings, IMetrics, IMetricsBackend, IMetricsOptions, IPromClient } from "./types";
 
 export class Metrics implements IMetrics {
-    private _logger: ILogger;
-    private _backend: IMetricsBackend;
-    private _expressMiddlewareProvider?: ExpressMiddlewareProvider;
-    private _expressMiddlewareSettings: IExpressMiddlewareSettings;
-    private _prometheusMiddleware?: RequestHandler;
+    private logger: ILogger;
+    private backend: IMetricsBackend;
+    private expressMiddlewareProvider?: ExpressMiddlewareProvider;
+    private expressMiddlewareSettings: IExpressMiddlewareSettings;
+    private prometheusMiddleware?: RequestHandler;
 
     constructor({
         logger,
@@ -21,46 +21,46 @@ export class Metrics implements IMetrics {
         expressMiddlewareProvider,
         expressMiddlewareSettings,
     }: Partial<IMetricsOptions> = {}) {
-        this._logger = logger || { ...console, filterFunction: (x) => x, child: () => this._logger };
+        this.logger = logger || { ...console, filterFunction: (x) => x, child: () => this.logger };
 
-        this._backend = backend || this._getDefaultBackend(backendSettings || {});
-        this._expressMiddlewareProvider = expressMiddlewareProvider;
-        this._expressMiddlewareSettings = expressMiddlewareSettings;
+        this.backend = backend || this.getDefaultBackend(backendSettings || {});
+        this.expressMiddlewareProvider = expressMiddlewareProvider;
+        this.expressMiddlewareSettings = expressMiddlewareSettings;
     }
 
     public async init(): Promise<void> {
-        await this._backend.startServer();
-        this._logger.info(`Monitoring server started on port ${this._backend.getServerPort()}.`);
+        await this.backend.startServer();
+        this.logger.info(`Monitoring server started on port ${this.backend.getServerPort()}.`);
     }
 
     public getMonitoringMiddleware(): RequestHandler {
-        this._setupExpressMiddleware(this._expressMiddlewareProvider, this._expressMiddlewareSettings);
+        this.setupExpressMiddleware(this.expressMiddlewareProvider, this.expressMiddlewareSettings);
 
-        if (!this._prometheusMiddleware) {
+        if (!this.prometheusMiddleware) {
             throw new Error("Prometheus middleware is not initialized.");
         }
 
-        return this._prometheusMiddleware;
+        return this.prometheusMiddleware;
     }
 
     public async destroy(): Promise<void> {
-        await this._backend.stopServer();
-        this._logger.info("Monitoring server stopped.");
+        await this.backend.stopServer();
+        this.logger.info("Monitoring server stopped.");
     }
 
     public getServerPort(): number {
-        const port = this._backend.getServerPort();
+        const port = this.backend.getServerPort();
 
         return port;
     }
 
     public getClient(): IPromClient {
-        return this._backend.getClient();
+        return this.backend.getClient();
     }
 
-    private _setupExpressMiddleware(expressMiddlewareProvider: ExpressMiddlewareProvider | undefined, expressMiddlewareSettings: IExpressMiddlewareSettings): void {
-        if (!this._prometheusMiddleware) {
-            const metricsRegister = this._backend.getClient().register;
+    private setupExpressMiddleware(expressMiddlewareProvider: ExpressMiddlewareProvider | undefined, expressMiddlewareSettings: IExpressMiddlewareSettings): void {
+        if (!this.prometheusMiddleware) {
+            const metricsRegister = this.backend.getClient().register;
 
             if (!expressMiddlewareProvider) {
                 // Use the Kinvey registry for the metrics in the middleware.
@@ -71,13 +71,13 @@ export class Metrics implements IMetrics {
 
             const provider = expressMiddlewareProvider ? expressMiddlewareProvider(metricsRegister) : promBundle;
 
-            this._prometheusMiddleware = provider(settings);
+            this.prometheusMiddleware = provider(settings);
         }
     }
 
-    private _getDefaultBackend(backendSettings: Partial<IBackendSettings>): IMetricsBackend {
+    private getDefaultBackend(backendSettings: Partial<IBackendSettings>): IMetricsBackend {
         const settings = {
-            logger: this._logger,
+            logger: this.logger,
             ...DefaultBackendSettings,
             ...backendSettings,
         };
