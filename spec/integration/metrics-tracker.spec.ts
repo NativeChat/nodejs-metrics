@@ -1,5 +1,3 @@
-"use strict";
-
 import { verifyMetricsResponse } from "../helpers/helpers";
 
 import { Metrics, MetricsTracker } from "../../index";

@@ -1,9 +1,9 @@
 import { Labels } from "./constants";
-import { ICounter, IHistogram, IIncrementCounterOptions, IMetrics, IMetricsTracker, ITrackHistogramDurationOptions } from "./types";
+import { ICounter, IHistogram, IIncrementCounterOptions, IMetricsDictionary, IMetricsTracker, IMetricsTrackerOptions, ITrackHistogramDurationOptions } from "./types";
 
 export class MetricsTracker implements IMetricsTracker {
-    public metrics?: IMetrics;
-    constructor({ metrics }: { metrics?: IMetrics }) {
+    public metrics?: IMetricsDictionary;
+    constructor({ metrics }: IMetricsTrackerOptions) {
         this.metrics = metrics;
     }
 
@@ -41,7 +41,7 @@ export class MetricsTracker implements IMetricsTracker {
         }
     }
 
-    public incrementCounter({ metricName, labels }: IIncrementCounterOptions) {
+    public incrementCounter({ count, metricName, labels }: IIncrementCounterOptions) {
         if (!this.metrics) {
             return;
         }
@@ -49,7 +49,7 @@ export class MetricsTracker implements IMetricsTracker {
         this._verifyMetric(metricName);
 
         const metric = this.metrics[metricName] as ICounter;
-        metric.inc(labels);
+        metric.inc(labels, count);
     }
 
     private _verifyMetric(metricName: string) {

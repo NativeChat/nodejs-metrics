@@ -1,15 +1,16 @@
+import { RequestHandler } from "express";
 import promBundle from "express-prom-bundle";
 import { ILogger } from "nchat-dev-common";
 
 import { PrometheusMetricsBackend } from "./backends/prometheus";
 
 import { ExpressMiddlewareDefaultSettings, DefaultBackendSettings } from "./constants";
-import { IBackendSettings, IMetricsBackend } from "./types";
+import { ExpressMiddlewareProvider, IBackendSettings, IExpressMiddlewareSettings, IMetrics, IMetricsBackend, IMetricsOptions, IPromClient } from "./types";
 
-export class Metrics {
+export class Metrics implements IMetrics {
     private _logger: ILogger;
     private _backend: IMetricsBackend;
-    private _expressMiddlewareProvider: ExpressMiddlewareProvider;
+    private _expressMiddlewareProvider?: ExpressMiddlewareProvider;
     private _expressMiddlewareSettings: IExpressMiddlewareSettings;
     private _prometheusMiddleware?: RequestHandler;
 
@@ -19,10 +20,10 @@ export class Metrics {
         backendSettings,
         expressMiddlewareProvider,
         expressMiddlewareSettings,
-    } = {} as any) {
-        this._logger = logger || console;
+    }: Partial<IMetricsOptions> = {}) {
+        this._logger = logger || { ...console, filterFunction: (x) => x, child: () => this._logger };
 
-        this._backend = backend || this._getDefaultBackend(backendSettings);
+        this._backend = backend || this._getDefaultBackend(backendSettings || {});
         this._expressMiddlewareProvider = expressMiddlewareProvider;
         this._expressMiddlewareSettings = expressMiddlewareSettings;
     }
@@ -32,8 +33,12 @@ export class Metrics {
         this._logger.info(`Monitoring server started on port ${this._backend.getServerPort()}.`);
     }
 
-    public getMonitoringMiddleware() {
+    public getMonitoringMiddleware(): RequestHandler {
         this._setupExpressMiddleware(this._expressMiddlewareProvider, this._expressMiddlewareSettings);
+
+        if (!this._prometheusMiddleware) {
+            throw new Error("Prometheus middleware is not initialized.");
+        }
 
         return this._prometheusMiddleware;
     }
@@ -53,7 +58,7 @@ export class Metrics {
         return this._backend.getClient();
     }
 
-    private _setupExpressMiddleware(expressMiddlewareProvider: ExpressMiddlewareProvider, expressMiddlewareSettings: IExpressMiddlewareSettings): void {
+    private _setupExpressMiddleware(expressMiddlewareProvider: ExpressMiddlewareProvider | undefined, expressMiddlewareSettings: IExpressMiddlewareSettings): void {
         if (!this._prometheusMiddleware) {
             const metricsRegister = this._backend.getClient().register;
 

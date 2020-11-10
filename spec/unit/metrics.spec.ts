@@ -1,4 +1,3 @@
-
 import { Metrics } from "../../index";
 import sinon from "sinon";
 
@@ -15,7 +14,7 @@ const getBackend = (register = {}) => {
 
 const getExpressMiddlewareProvider = () => {
     // tslint:disable-next-line: no-empty
-    const expressMiddlewareProvider = sinon.stub().returns(() => { });
+    const expressMiddlewareProvider = sinon.stub().returns(() => ({ }));
 
     return expressMiddlewareProvider;
 };

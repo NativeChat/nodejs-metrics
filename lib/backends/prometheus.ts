@@ -6,7 +6,7 @@ import client from "prom-client";
 import { ILogger } from "nchat-dev-common";
 
 import { DefaultBackendSettings } from "../constants";
-import { IBackendSettings, IMetricsBackend } from "../types";
+import { IBackendSettings, IMetricsBackend, IPromClient } from "../types";
 
 export class PrometheusMetricsBackend implements IMetricsBackend {
     private _client: typeof client;
@@ -100,13 +100,13 @@ export class PrometheusMetricsBackend implements IMetricsBackend {
 
                     resolve();
                 });
-               } else {
-                resolve();
             }
+
+            resolve();
         });
     }
 
-    private _setupServer(): viod {
+    private _setupServer(): void {
         this.app = express();
 
         this.app.get("/metrics", (_req, res) => {

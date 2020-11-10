@@ -1,4 +1,7 @@
+import { RequestHandler } from "express";
+import { Opts } from "express-prom-bundle/types";
 import { ILogger } from "nchat-dev-common";
+import client, { Registry } from "prom-client";
 
 export interface IBackendSettings {
     defaultMetricsTimeout: number;
@@ -50,24 +53,39 @@ export interface IMetricsClient {
     Counter: CounterConstructor;
 }
 
-export interface ITrackHistogramDurationOptions<T> extends IIncrementCounterOptions {
+export interface IHistogramActionComposition<T> {
     action: () => Promise<T>;
     handleResult?: (result: T, labels: IDictionary<string>) => void;
 }
 
-export interface IIncrementCounterOptions {
-    metricName: string;
+export interface ILabelsComposition {
     labels: IDictionary<string>;
+}
+
+export interface ITrackHistogramDurationOptions<T> extends IIncrementCounterOptions, IHistogramActionComposition<T> {
+}
+
+export interface IIncrementCounterOptions extends ILabelsComposition {
+    metricName: string;
+    count?: number;
 }
 
 export type IMetric = ICounter | IHistogram;
 
-export type IMetrics = IDictionary<IMetric>;
+export type IMetricsDictionary = IDictionary<IMetric>;
+
+export interface IMetrics {
+    init(): Promise<void>;
+    destroy(): Promise<void>;
+    getMonitoringMiddleware(): RequestHandler;
+    getServerPort(): number;
+    getClient(): IPromClient;
+}
 
 export interface IMetricsTracker {
     trackHistogramDuration<T>(options: ITrackHistogramDurationOptions<T>): Promise<T>;
     incrementCounter(options: IIncrementCounterOptions): void;
-    metrics?: IMetrics;
+    metrics?: IMetricsDictionary;
 }
 
 export interface IMetricsOptions {
@@ -88,7 +106,17 @@ export interface IMetricsBackend {
 export type IPromClient = typeof client;
 
 export interface IMetricsTrackerOptions {
-    metrics?: IMetrics;
+    metrics?: IMetricsDictionary;
 }
 
-export type ExpressMiddlewareProvider = (settings: IExpressMiddlewareSettings) => RequestHandler;
+export type IExpressMiddlewareSettings = Opts;
+export type RequestHandlerProvider = (settings: IExpressMiddlewareSettings) => RequestHandler;
+export type ExpressMiddlewareProvider = (registry: Registry) => RequestHandlerProvider;
+
+export interface IExternalServiceMetricsTrackingOptions<T> extends IHistogramActionComposition<T> {
+    targetLabel: string;
+}
+
+export interface IExternalServiceMetricsTracker {
+    trackHistogramDuration<T>(options: IExternalServiceMetricsTrackingOptions<T>): Promise<T>;
+}

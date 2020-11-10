@@ -12,6 +12,15 @@
       "env": {
         "TERMINAL_REPORTER_ENABLED": "1"
       }
-    }
+    },
+    {
+        "type": "node",
+        "request": "launch",
+        "name": "Unit Tests",
+        "program": "${workspaceFolder}/spec/unit-runner.js",
+        "env": {
+          "TERMINAL_REPORTER_ENABLED": "1"
+        }
+      },
   ]
 }

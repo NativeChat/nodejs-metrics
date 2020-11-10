@@ -1,8 +1,8 @@
 import { ExternalServiceMetricConstants } from "./constants";
 import { MetricsTracker } from "./metrics-tracker";
-import { IDictionary, IMetricsClient, ITrackHistogramDurationOptions } from "./types";
+import { IExternalServiceMetricsTrackingOptions, IExternalServiceMetricsTracker, IMetricsClient } from "./types";
 
-export class ExternalServiceMetricsTracker {
+export class ExternalServiceMetricsTracker implements IExternalServiceMetricsTracker {
     private _metricsTracker: MetricsTracker;
 
     constructor({ promClient }: { promClient: IMetricsClient }) {
@@ -27,11 +27,7 @@ export class ExternalServiceMetricsTracker {
         targetLabel,
         action,
         handleResult,
-    }: {
-        targetLabel: string;
-        action: () => Promise<T>;
-        handleResult?: (result: T, labels: IDictionary<string>) => void;
-    }) {
+    }: IExternalServiceMetricsTrackingOptions<T>) {
         return await this._metricsTracker.trackHistogramDuration({
             metricName: ExternalServiceMetricConstants.Name,
             labels: {
