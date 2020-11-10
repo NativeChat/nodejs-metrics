@@ -11,7 +11,7 @@ export class Metrics implements IMetrics {
     private logger: ILogger;
     private backend: IMetricsBackend;
     private expressMiddlewareProvider?: ExpressMiddlewareProvider;
-    private expressMiddlewareSettings: IExpressMiddlewareSettings;
+    private expressMiddlewareSettings?: IExpressMiddlewareSettings;
     private prometheusMiddleware?: RequestHandler;
 
     constructor({
@@ -58,7 +58,7 @@ export class Metrics implements IMetrics {
         return this.backend.getClient();
     }
 
-    private setupExpressMiddleware(expressMiddlewareProvider: ExpressMiddlewareProvider | undefined, expressMiddlewareSettings: IExpressMiddlewareSettings): void {
+    private setupExpressMiddleware(expressMiddlewareProvider: ExpressMiddlewareProvider | undefined, expressMiddlewareSettings: IExpressMiddlewareSettings | undefined): void {
         if (!this.prometheusMiddleware) {
             const metricsRegister = this.backend.getClient().register;
 

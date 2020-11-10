@@ -93,7 +93,7 @@ export interface IMetricsOptions {
     backend: IMetricsBackend;
     backendSettings: IBackendSettings;
     expressMiddlewareProvider: ExpressMiddlewareProvider;
-    expressMiddlewareSettings: any;
+    expressMiddlewareSettings: IExpressMiddlewareSettings;
 }
 
 export interface IMetricsBackend {
