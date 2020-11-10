@@ -1,6 +1,5 @@
 {
     "extends": "nchat-dev-common/tslint",
     "defaultSeverity": "error",
-    "rules": {
-    }
+    "rules": {}
 }

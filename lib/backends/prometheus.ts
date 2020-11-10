@@ -45,11 +45,11 @@ export class PrometheusMetricsBackend implements IMetricsBackend {
         this._defaultMetricsTimeout = defaultMetricsTimeout || DefaultBackendSettings.defaultMetricsTimeout || 0;
     }
 
-    public getClient() {
+    public getClient(): IPromClient {
         return this._client;
     }
 
-    public getServerPort() {
+    public getServerPort(): number {
         return this._serverPort;
     }
 
@@ -100,13 +100,13 @@ export class PrometheusMetricsBackend implements IMetricsBackend {
 
                     resolve();
                 });
+               } else {
+                resolve();
             }
-
-            resolve();
         });
     }
 
-    private _setupServer() {
+    private _setupServer(): viod {
         this.app = express();
 
         this.app.get("/metrics", (_req, res) => {

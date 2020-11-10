@@ -72,15 +72,23 @@ export interface IMetricsTracker {
 
 export interface IMetricsOptions {
     logger: ILogger;
-    backend: any;
+    backend: IMetricsBackend;
     backendSettings: IBackendSettings;
-    expressMiddlewareProvider: any;
+    expressMiddlewareProvider: ExpressMiddlewareProvider;
     expressMiddlewareSettings: any;
 }
 
 export interface IMetricsBackend {
-    getClient(): any;
+    getClient(): IPromClient;
     getServerPort(): number;
     startServer(): Promise<void>;
     stopServer(): Promise<void>;
 }
+
+export type IPromClient = typeof client;
+
+export interface IMetricsTrackerOptions {
+    metrics?: IMetrics;
+}
+
+export type ExpressMiddlewareProvider = (settings: IExpressMiddlewareSettings) => RequestHandler;

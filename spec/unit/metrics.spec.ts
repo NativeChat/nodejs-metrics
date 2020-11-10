@@ -1,4 +1,3 @@
-"use strict";
 
 import { Metrics } from "../../index";
 import sinon from "sinon";

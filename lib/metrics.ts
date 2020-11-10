@@ -9,9 +9,9 @@ import { IBackendSettings, IMetricsBackend } from "./types";
 export class Metrics {
     private _logger: ILogger;
     private _backend: IMetricsBackend;
-    private _expressMiddlewareProvider: any;
-    private _expressMiddlewareSettings: any;
-    private _prometheusMiddleware: any;
+    private _expressMiddlewareProvider: ExpressMiddlewareProvider;
+    private _expressMiddlewareSettings: IExpressMiddlewareSettings;
+    private _prometheusMiddleware?: RequestHandler;
 
     constructor({
         logger,
@@ -27,7 +27,7 @@ export class Metrics {
         this._expressMiddlewareSettings = expressMiddlewareSettings;
     }
 
-    public async init() {
+    public async init(): Promise<void> {
         await this._backend.startServer();
         this._logger.info(`Monitoring server started on port ${this._backend.getServerPort()}.`);
     }
@@ -38,22 +38,22 @@ export class Metrics {
         return this._prometheusMiddleware;
     }
 
-    public async destroy() {
+    public async destroy(): Promise<void> {
         await this._backend.stopServer();
         this._logger.info("Monitoring server stopped.");
     }
 
-    public getServerPort() {
+    public getServerPort(): number {
         const port = this._backend.getServerPort();
 
         return port;
     }
 
-    public getClient() {
+    public getClient(): IPromClient {
         return this._backend.getClient();
     }
 
-    private _setupExpressMiddleware(expressMiddlewareProvider: any, expressMiddlewareSettings: any) {
+    private _setupExpressMiddleware(expressMiddlewareProvider: ExpressMiddlewareProvider, expressMiddlewareSettings: IExpressMiddlewareSettings): void {
         if (!this._prometheusMiddleware) {
             const metricsRegister = this._backend.getClient().register;
 
