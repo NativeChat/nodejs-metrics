@@ -1,14 +1,12 @@
-'use strict';
-
 // https://stackoverflow.com/questions/29011457/jasmine-jasmine-reporters-on-nodejs-missing-output
 
-const Jasmine = require('jasmine');
-const { JUnitXmlReporter, TerminalReporter } = require('jasmine-reporters');
-const { existsSync, mkdirSync } = require('fs');
+import Jasmine from "jasmine";
+import { existsSync, mkdirSync } from "fs";
 
+// tslint:disable-next-line: no-var-requires
+const { JUnitXmlReporter, TerminalReporter } = require("jasmine-reporters");
 
-
-const addReporters = (jasmineEnv) => {
+const addReporters = (jasmineEnv: Jasmine) => {
     const reportsPath = `${__dirname}/../reports`;
     if (!existsSync(reportsPath)) {
         mkdirSync(reportsPath);
@@ -16,26 +14,26 @@ const addReporters = (jasmineEnv) => {
 
     const junitReporter = new JUnitXmlReporter({
         savePath: reportsPath,
-        consolidateAll: false
+        consolidateAll: false,
     });
 
     jasmineEnv.addReporter(junitReporter);
 
     const terminalReporter = new TerminalReporter({
         color: true,
-        verbosity: 3
+        verbosity: 3,
     });
 
     jasmineEnv.addReporter(terminalReporter);
 };
 
-module.exports = (jasmineConfigFile, configure) => {
-    const jasmineEnv = new Jasmine();
+export const runner = (jasmineConfigFile: string, configure?: ((jasmine: Jasmine) => void)) => {
+    const jasmineEnv = new Jasmine({});
     jasmineEnv.loadConfigFile(jasmineConfigFile);
     addReporters(jasmineEnv);
 
-    if (configure && typeof configure === 'function') {
-        configure(jasmine);
+    if (configure && typeof configure === "function") {
+        configure(jasmineEnv);
     }
 
     jasmineEnv.execute();
