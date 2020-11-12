@@ -27,14 +27,17 @@ export class MetricsTracker implements IMetricsTracker {
         try {
             const result = await action();
             if (handleResult) {
-                handleResult(result, labels);
+                handleResult(null, labels, result);
             }
 
             timer();
 
             return result;
         } catch (err) {
-            labels[Labels.Error] = err.name || err.type || err.code;
+            if (handleResult) {
+                handleResult(err, labels);
+            }
+
             timer();
 
             throw err;

@@ -55,7 +55,7 @@ export interface IMetricsClient {
 
 export interface IHistogramActionComposition<T> {
     action: () => Promise<T>;
-    handleResult?: (result: T, labels: IDictionary<string>) => void;
+    handleResult?: (err: any | null, labels: IDictionary<string>, result?: T) => void;
 }
 
 export interface ILabelsComposition {
