@@ -21,7 +21,7 @@ export class Metrics implements IMetrics {
         expressMiddlewareProvider,
         expressMiddlewareSettings,
     }: Partial<IMetricsOptions> = {}) {
-        this.logger = logger || { ...console, filterFunction: (x) => x, child: () => this.logger };
+        this.logger = logger || { ...console, child: () => this.logger };
 
         this.backend = backend || this.getDefaultBackend(backendSettings || {});
         this.expressMiddlewareProvider = expressMiddlewareProvider;
