@@ -37,7 +37,6 @@ export class PrometheusMetricsBackend implements IMetricsBackend {
             // tslint:disable-next-line: no-console
             error: () => console.error,
             child: () => this.logger,
-            filterFunction: (x) => x,
         };
 
         this.desiredServerPort = serverPort || 0;
