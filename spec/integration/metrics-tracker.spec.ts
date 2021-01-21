@@ -101,5 +101,52 @@ describe("MetricsTracker", () => {
                 "test{foo=\"bar\"} 1",
             ]);
         });
+
+        it("should track gauge metrics.", async () => {
+            const client = metrics.getClient();
+            const tracker = new MetricsTracker({
+                metrics: {
+                    test: new (client.Gauge)({
+                        name: "test",
+                        help: "some help",
+                        labelNames: ["foo"],
+                    }),
+                },
+            });
+
+            tracker.incrementGauge({
+                metricName: "test",
+                labels: { "foo": "bar" },
+            });
+
+            await verifyMetricsResponse([
+                "# HELP test some help",
+                "# TYPE test gauge",
+                "test{foo=\"bar\"} 1",
+            ]);
+
+            tracker.setGauge({
+                metricName: "test",
+                labels: { "foo": "bar" },
+                count: 10,
+            });
+
+            await verifyMetricsResponse([
+                "# HELP test some help",
+                "# TYPE test gauge",
+                "test{foo=\"bar\"} 10",
+            ]);
+
+            tracker.decrementGauge({
+                metricName: "test",
+                labels: { "foo": "bar" },
+            });
+
+            await verifyMetricsResponse([
+                "# HELP test some help",
+                "# TYPE test gauge",
+                "test{foo=\"bar\"} 9",
+            ]);
+        });
     });
 });

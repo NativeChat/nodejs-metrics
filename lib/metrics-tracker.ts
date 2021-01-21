@@ -1,5 +1,5 @@
 import { Labels } from "./constants";
-import { ICounter, IHistogram, IIncrementCounterOptions, IMetricsDictionary, IMetricsTracker, IMetricsTrackerOptions, ITrackHistogramDurationOptions } from "./types";
+import { ICounter, IGauge, IHistogram, IIncrementCounterOptions, IIncrementDecrementGaugeOptions, IMetricsDictionary, IMetricsTracker, IMetricsTrackerOptions, ISetGaugeOptions, ITrackHistogramDurationOptions } from "./types";
 
 export class MetricsTracker implements IMetricsTracker {
     public metrics?: IMetricsDictionary;
@@ -53,6 +53,39 @@ export class MetricsTracker implements IMetricsTracker {
 
         const metric = this.metrics[metricName] as ICounter;
         metric.inc(labels, count);
+    }
+
+    public incrementGauge({ count, metricName, labels }: IIncrementDecrementGaugeOptions) {
+        if (!this.metrics) {
+            return;
+        }
+
+        this.verifyMetric(metricName);
+
+        const metric = this.metrics[metricName] as IGauge;
+        metric.inc(labels, count);
+    }
+
+    public decrementGauge({ count, metricName, labels }: IIncrementDecrementGaugeOptions) {
+        if (!this.metrics) {
+            return;
+        }
+
+        this.verifyMetric(metricName);
+
+        const metric = this.metrics[metricName] as IGauge;
+        metric.dec(labels, count);
+    }
+
+    public setGauge({ count, metricName, labels }: ISetGaugeOptions) {
+        if (!this.metrics) {
+            return;
+        }
+
+        this.verifyMetric(metricName);
+
+        const metric = this.metrics[metricName] as IGauge;
+        metric.set(labels, count);
     }
 
     private verifyMetric(metricName: string) {

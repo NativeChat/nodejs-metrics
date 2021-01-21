@@ -44,6 +44,15 @@ export interface ICounter {
     inc(value?: number, timestamp?: number | Date): void;
 }
 
+export interface IGauge {
+    set(labels: labelValues, value: number, timestamp?: number | Date): void;
+    set(value: number, timestamp?: number | Date): void;
+    inc(labels: labelValues, value?: number, timestamp?: number | Date): void;
+    inc(value?: number, timestamp?: number | Date): void;
+    dec(labels: labelValues, value?: number, timestamp?: number | Date): void;
+    dec(value?: number, timestamp?: number | Date): void;
+}
+
 export type HistogramConstructor = new (options: IHistogramOptions) => IHistogram;
 
 export type CounterConstructor = new (options: ICounterOptions) => ICounter;
@@ -70,7 +79,17 @@ export interface IIncrementCounterOptions extends ILabelsComposition {
     count?: number;
 }
 
-export type IMetric = ICounter | IHistogram;
+export interface ISetGaugeOptions extends ILabelsComposition {
+    metricName: string;
+    count: number;
+}
+
+export interface IIncrementDecrementGaugeOptions extends ILabelsComposition {
+    metricName: string;
+    count?: number;
+}
+
+export type IMetric = ICounter | IHistogram | IGauge;
 
 export type IMetricsDictionary = IDictionary<IMetric>;
 
@@ -85,6 +104,9 @@ export interface IMetrics {
 export interface IMetricsTracker {
     trackHistogramDuration<T>(options: ITrackHistogramDurationOptions<T>): Promise<T>;
     incrementCounter(options: IIncrementCounterOptions): void;
+    incrementGauge(options: IIncrementDecrementGaugeOptions): void;
+    decrementGauge(options: IIncrementDecrementGaugeOptions): void;
+    setGauge(options: ISetGaugeOptions): void;
     metrics?: IMetricsDictionary;
 }
 
