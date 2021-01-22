@@ -74,18 +74,19 @@ export interface ILabelsComposition {
 export interface ITrackHistogramDurationOptions<T> extends IIncrementCounterOptions, IHistogramActionComposition<T> {
 }
 
-export interface IIncrementCounterOptions extends ILabelsComposition {
+export interface IMetricNameComposition {
     metricName: string;
+}
+
+export interface IIncrementCounterOptions extends ILabelsComposition, IMetricNameComposition {
     count?: number;
 }
 
-export interface ISetGaugeOptions extends ILabelsComposition {
-    metricName: string;
+export interface ISetGaugeOptions extends ILabelsComposition, IMetricNameComposition {
     count: number;
 }
 
-export interface IIncrementDecrementGaugeOptions extends ILabelsComposition {
-    metricName: string;
+export interface IIncrementDecrementGaugeOptions extends ILabelsComposition, IMetricNameComposition {
     count?: number;
 }
 

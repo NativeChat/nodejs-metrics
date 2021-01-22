@@ -77,7 +77,9 @@ describe("MetricsTracker", () => {
                 "test_count{foo=\"bar\",error=\"TestErr\"} 1",
             ]);
         });
+    });
 
+    describe("incrementCounter", () => {
         it("should track counter metrics.", async () => {
             const client = metrics.getClient();
             const tracker = new MetricsTracker({
@@ -101,7 +103,9 @@ describe("MetricsTracker", () => {
                 "test{foo=\"bar\"} 1",
             ]);
         });
+    });
 
+    describe("incrementGauge, decrementGauge, setGauge", () => {
         it("should track gauge metrics.", async () => {
             const client = metrics.getClient();
             const tracker = new MetricsTracker({
