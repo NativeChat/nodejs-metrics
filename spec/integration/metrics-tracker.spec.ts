@@ -1,6 +1,6 @@
 import { verifyMetricsResponse } from "../helpers/helpers";
 
-import { Metrics, MetricsTracker } from "../../index";
+import { IDictionary, Metrics, MetricsTracker } from "../../index";
 
 describe("MetricsTracker", () => {
     let metrics: Metrics;
@@ -41,6 +41,9 @@ describe("MetricsTracker", () => {
                     err.name = "TestErr";
 
                     throw err;
+                },
+                handleResult: (error: Error, labels: IDictionary<string>) => {
+                    labels.error = error.name;
                 },
             }) as any)).toBeRejected();
 

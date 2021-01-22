@@ -1,6 +1,6 @@
 import { verifyMetricsResponse } from "../helpers/helpers";
 
-import { ExternalServiceMetricsTracker, Metrics } from "../../index";
+import { ExternalServiceMetricsTracker, IDictionary, Metrics } from "../../index";
 
 describe("ExternalServiceMetricsTracker", () => {
     let metrics: Metrics;
@@ -44,6 +44,9 @@ describe("ExternalServiceMetricsTracker", () => {
                 err.name = "TestErr";
 
                 throw err;
+            },
+            handleResult: (error: Error, labels: IDictionary<string>) => {
+                labels.error = error.name;
             },
         }) as any)).toBeRejected();
 
