@@ -1,6 +1,6 @@
 import { verifyMetricsResponse } from "../helpers/helpers";
 
-import { Metrics, MetricsTracker } from "../../index";
+import { IDictionary, Metrics, MetricsTracker } from "../../index";
 
 describe("MetricsTracker", () => {
     let metrics: Metrics;
@@ -42,6 +42,9 @@ describe("MetricsTracker", () => {
 
                     throw err;
                 },
+                handleResult: (error: Error, labels: IDictionary<string>) => {
+                    labels.error = error.name;
+                },
             }) as any)).toBeRejected();
 
             await verifyMetricsResponse([
@@ -77,7 +80,9 @@ describe("MetricsTracker", () => {
                 "test_count{foo=\"bar\",error=\"TestErr\"} 1",
             ]);
         });
+    });
 
+    describe("incrementCounter", () => {
         it("should track counter metrics.", async () => {
             const client = metrics.getClient();
             const tracker = new MetricsTracker({
@@ -99,6 +104,55 @@ describe("MetricsTracker", () => {
                 "# HELP test some help",
                 "# TYPE test counter",
                 "test{foo=\"bar\"} 1",
+            ]);
+        });
+    });
+
+    describe("incrementGauge, decrementGauge, setGauge", () => {
+        it("should track gauge metrics.", async () => {
+            const client = metrics.getClient();
+            const tracker = new MetricsTracker({
+                metrics: {
+                    test: new (client.Gauge)({
+                        name: "test",
+                        help: "some help",
+                        labelNames: ["foo"],
+                    }),
+                },
+            });
+
+            tracker.incrementGauge({
+                metricName: "test",
+                labels: { "foo": "bar" },
+            });
+
+            await verifyMetricsResponse([
+                "# HELP test some help",
+                "# TYPE test gauge",
+                "test{foo=\"bar\"} 1",
+            ]);
+
+            tracker.setGauge({
+                metricName: "test",
+                labels: { "foo": "bar" },
+                count: 10,
+            });
+
+            await verifyMetricsResponse([
+                "# HELP test some help",
+                "# TYPE test gauge",
+                "test{foo=\"bar\"} 10",
+            ]);
+
+            tracker.decrementGauge({
+                metricName: "test",
+                labels: { "foo": "bar" },
+            });
+
+            await verifyMetricsResponse([
+                "# HELP test some help",
+                "# TYPE test gauge",
+                "test{foo=\"bar\"} 9",
             ]);
         });
     });
