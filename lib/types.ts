@@ -23,6 +23,12 @@ export interface ICounterOptions {
     help: string;
 }
 
+export interface IGaugeOptions {
+    name: string;
+    labelNames: string[];
+    help: string;
+}
+
 export interface ICollectMetricsOptions {
     client: IMetricsClient;
 }
@@ -57,9 +63,12 @@ export type HistogramConstructor = new (options: IHistogramOptions) => IHistogra
 
 export type CounterConstructor = new (options: ICounterOptions) => ICounter;
 
+export type GaugeConstructor = new (options: IGaugeOptions) => IGauge;
+
 export interface IMetricsClient {
     Histogram: HistogramConstructor;
     Counter: CounterConstructor;
+    Gauge: GaugeConstructor;
 }
 
 export interface IHistogramActionComposition<T> {
