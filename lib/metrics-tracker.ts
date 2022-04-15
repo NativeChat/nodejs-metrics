@@ -1,4 +1,3 @@
-import { Labels } from "./constants";
 import { ICounter, IGauge, IHistogram, IIncrementCounterOptions, IIncrementDecrementGaugeOptions, IMetricsDictionary, IMetricsTracker, IMetricsTrackerOptions, ISetGaugeOptions, ITrackHistogramDurationOptions } from "./types";
 
 export class MetricsTracker implements IMetricsTracker {
@@ -18,7 +17,7 @@ export class MetricsTracker implements IMetricsTracker {
 
         this.verifyMetric(metricName);
 
-        // tslint:disable-next-line: no-parameter-reassignment
+        // eslint-disable-next-line no-param-reassign
         labels = labels || {};
 
         const metric = this.metrics[metricName] as IHistogram;
