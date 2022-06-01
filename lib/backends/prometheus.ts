@@ -28,13 +28,13 @@ export class PrometheusMetricsBackend implements IMetricsBackend {
 
         this.client = client;
         this.logger = logger || {
-            // tslint:disable-next-line: no-console
+            // eslint-disable-next-line no-console
             debug: () => console.debug,
-            // tslint:disable-next-line: no-console
+            // eslint-disable-next-line no-console
             info: () => console.log,
-            // tslint:disable-next-line: no-console
+            // eslint-disable-next-line no-console
             warn: () => console.warn,
-            // tslint:disable-next-line: no-console
+            // eslint-disable-next-line no-console
             error: () => console.error,
             child: () => this.logger,
         };
