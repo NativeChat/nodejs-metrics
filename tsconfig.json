@@ -14,6 +14,7 @@
     "alwaysStrict": true,
     "moduleResolution": "node",
     "experimentalDecorators": true,
+    "useUnknownInCatchVariables": false,
     "emitDecoratorMetadata": true
   },
   "include": [

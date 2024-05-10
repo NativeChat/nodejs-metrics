@@ -47,7 +47,7 @@ describe("Metrics", () => {
             const port = 55555;
             const appServerUrl = `http://localhost:${port}`;
 
-            await new Promise((resolve) => {
+            await new Promise<void>((resolve) => {
                 const app = express();
 
                 app.use(metrics.getMonitoringMiddleware());
@@ -75,7 +75,7 @@ describe("Metrics", () => {
         it("should start the server on a new port if the default one is busy.", async () => {
             await metrics.destroy();
 
-            await new Promise((resolve, reject) => {
+            await new Promise<void>((resolve, reject) => {
                 const app = express();
                 app.once("error", reject);
                 app.listen(DefaultMetricsServerPort, resolve);
