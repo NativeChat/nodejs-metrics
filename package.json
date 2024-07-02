@@ -1,6 +1,6 @@
 {
   "name": "nodejs-metrics",
-  "version": "0.14.1",
+  "version": "0.14.2",
   "description": "Module which provides metrics server for NodeJS applications.",
   "main": "index.js",
   "types": "./index",
@@ -10,7 +10,8 @@
     "lint": "eslint . --ext=ts --ignore-pattern=**/*.d.ts",
     "lint-fix": "npm run lint -- --fix",
     "build": "tsc -d",
-    "prepack": "npm run build"
+    "prepack": "npm run build",
+    "security-pack": "tar zcvf nodejs-metrics.tgz --exclude='./node_modules' --exclude='*.js' --exclude='*.js.map' --exclude='.git' --exclude='coverage' --exclude='reports' --exclude='.vscode' --exclude='*.tgz' *"
   },
   "repository": {
     "type": "git",
